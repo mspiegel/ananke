@@ -1,0 +1,10 @@
+hash: d5508471b3a8a44ee1dc71bb0d7439b113d8a32fe256ff079b7fa3461cd20c95
+updated: 2017-09-22T22:09:01.673595694-04:00
+imports:
+- name: github.com/wadey/gocovmerge
+  version: b5bfa59ec0adc420475f97f89b58045c721d761c
+- name: golang.org/x/tools
+  version: 3b1faeda9afbcba128c2d794b38ffe7982141139
+  subpackages:
+  - cmd/goimports
+testImports: []
