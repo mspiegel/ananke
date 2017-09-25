@@ -32,7 +32,7 @@ clean:
 test: .GOPATH/.ok
 	$Q go test $(if $V,-v) -i -race $(allpackages) # install -race libs to speed up next run
 ifndef CI
-	$Q go vet $(allpackages)
+	$Q go vet -shadow $(allpackages)
 	$Q GODEBUG=cgocheck=2 go test -race $(allpackages)
 else
 	$Q ( go vet $(allpackages); echo $$? ) | \

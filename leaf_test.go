@@ -5,6 +5,56 @@ import (
 	"testing"
 )
 
+func TestGet(t *testing.T) {
+	leaf := Leaf{
+		Root:   true,
+		Epoch:  0,
+		Keys:   [][]byte{[]byte{'f', 'o', 'o'}},
+		Values: [][]byte{[]byte{'b', 'a', 'r'}},
+	}
+	val, success, err := leaf.Get([]byte{'f', 'o', 'o'})
+	if bytes.Compare(val, []byte{'b', 'a', 'r'}) != 0 {
+		t.Errorf("get on success incorrect value %v", val)
+	}
+	if !success {
+		t.Error("get on success incorrect success")
+	}
+	if err != nil {
+		t.Error("get on success incorrect error")
+	}
+	val, success, err = leaf.Get([]byte{'f', 'o'})
+	if bytes.Compare(val, []byte{}) != 0 {
+		t.Errorf("get on failure incorrect value %v", val)
+	}
+	if success {
+		t.Error("get on failure incorrect success")
+	}
+	if err != nil {
+		t.Error("get on failure incorrect error")
+	}
+}
+func TestScan(t *testing.T) {
+	leaf := Leaf{
+		Root:   true,
+		Epoch:  0,
+		Keys:   [][]byte{[]byte{'f', 'o', 'o'}},
+		Values: [][]byte{[]byte{'b', 'a', 'r'}},
+	}
+	scanner := func(key []byte, val []byte) error {
+		if bytes.Compare(key, []byte{'f', 'o', 'o'}) != 0 {
+			t.Errorf("scanner incorrect key %v", key)
+		}
+		if bytes.Compare(val, []byte{'b', 'a', 'r'}) != 0 {
+			t.Errorf("scanner incorrect value %v", val)
+		}
+		return nil
+	}
+	err := leaf.Scan(scanner)
+	if err != nil {
+		t.Error("scanner incorrect error")
+	}
+}
+
 func TestUpsert(t *testing.T) {
 	var leaf Leaf
 	var err error
