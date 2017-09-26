@@ -4,3 +4,4 @@ import:
   subpackages:
   - cmd/goimports
 - package: github.com/wadey/gocovmerge
+- package: github.com/mspiegel/go-multierror

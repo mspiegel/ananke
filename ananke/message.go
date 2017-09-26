@@ -11,6 +11,7 @@ const (
 )
 
 type Message struct {
+	Key  []byte
 	Op   Operation
 	Data []byte
 }
