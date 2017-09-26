@@ -17,6 +17,37 @@ func (n *Node) UnmarshalBinary(data []byte) error {
 	return n.unmarshalBinaryLeaf(data)
 }
 
+func putInt64(buf *bytes.Buffer, v int64) {
+	var b [8]byte
+	b[0] = byte(v)
+	b[1] = byte(v >> 8)
+	b[2] = byte(v >> 16)
+	b[3] = byte(v >> 24)
+	b[4] = byte(v >> 32)
+	b[5] = byte(v >> 40)
+	b[6] = byte(v >> 48)
+	b[7] = byte(v >> 56)
+	buf.Write(b[:])
+}
+
+func putLengths(buf *bytes.Buffer, array [][]byte) {
+	b := make([]byte, len(array)*8)
+	idx := 0
+	for i := range array {
+		v := int64(len(array[i]))
+		b[idx] = byte(v)
+		b[idx+1] = byte(v >> 8)
+		b[idx+2] = byte(v >> 16)
+		b[idx+3] = byte(v >> 24)
+		b[idx+4] = byte(v >> 32)
+		b[idx+5] = byte(v >> 40)
+		b[idx+6] = byte(v >> 48)
+		b[idx+7] = byte(v >> 56)
+		idx += 8
+	}
+	buf.Write(b)
+}
+
 func (n *Node) marshalBinaryLeaf() (data []byte, err error) {
 	size := NodeMinimumSize
 	// length of keys and values
@@ -29,17 +60,16 @@ func (n *Node) marshalBinaryLeaf() (data []byte, err error) {
 	}
 	data = make([]byte, 0, size)
 	buf := bytes.NewBuffer(data)
-	// buf.Write() implementation never returns an error
-	binary.Write(buf, binary.LittleEndian, n.Internal)
-	binary.Write(buf, binary.LittleEndian, n.ID)
-	binary.Write(buf, binary.LittleEndian, n.Epoch)
-	binary.Write(buf, binary.LittleEndian, int64(len(n.Keys)))
-	for i := range n.Keys {
-		binary.Write(buf, binary.LittleEndian, int64(len(n.Keys[i])))
+	if n.Internal {
+		buf.WriteByte(byte(1))
+	} else {
+		buf.WriteByte(byte(0))
 	}
-	for i := range n.Values {
-		binary.Write(buf, binary.LittleEndian, int64(len(n.Values[i])))
-	}
+	putInt64(buf, n.ID)
+	putInt64(buf, n.Epoch)
+	putInt64(buf, int64(len(n.Keys)))
+	putLengths(buf, n.Keys)
+	putLengths(buf, n.Values)
 	for i := range n.Keys {
 		buf.Write(n.Keys[i])
 	}

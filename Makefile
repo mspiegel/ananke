@@ -24,10 +24,13 @@ build: .GOPATH/.ok
 
 ##### =====> Utility targets <===== #####
 
-.PHONY: clean test list cover format
+.PHONY: clean test bench list cover format
 
 clean:
 	$Q rm -rf bin .GOPATH
+
+bench: .GOPATH/.ok
+	$Q cd .GOPATH/src/github.com/mspiegel/ananke/ananke && go test $(if $V,-v) -bench=. -benchmem
 
 test: .GOPATH/.ok
 	$Q go test $(if $V,-v) -i -race $(allpackages) # install -race libs to speed up next run
